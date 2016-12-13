@@ -326,7 +326,7 @@ class CurlyComponentManager {
     let { component, args, argsRevision, environment } = bucket;
 
     //SPIKE: GJ: record the current component
-    window.lastComponent = bucket.component.__proto__._debugContainerKey;
+    window.lastComponent = Object.getPrototypeOf(bucket.component)._debugContainerKey;
 
     bucket.finalizer = _instrumentStart('render.component', rerenderInstrumentDetails, component);
 
