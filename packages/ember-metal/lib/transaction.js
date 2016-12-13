@@ -76,7 +76,7 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
             label = 'the same value';
           }
 
-          return `You rendered "${parts.join('.')}" in "${lastTemplate}" and modified it in "[TODO (${object})]" in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
+          return `You rendered "${parts.join('.')}" in "${lastTemplate}" and modified it in "${window.lastComponent}" (${object}) in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
         }()),
         false);
 
