@@ -68,6 +68,8 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
     isEnabled('ember-glimmer-allow-backtracking-rerender')) {
   members.lastRendered = ownMap;
   members.lastRenderedFrom = ownMap; // FIXME: not used in production, remove me from prod builds
+  //SPIKE: GJ
+  members.lastRenderedInTemplate = ownMap;
 }
 
 let memberNames = Object.keys(members);
