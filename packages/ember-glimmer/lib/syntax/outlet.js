@@ -180,6 +180,9 @@ class OutletComponentManager {
   }
 
   create(environment, definition, args, dynamicScope) {
+    //SPIKE: GJ
+    window.lastComponent = definition.template.meta.moduleName;
+
     let outletStateReference = dynamicScope.outletState = dynamicScope.outletState.get('outlets').get(definition.outletName);
     let outletState = outletStateReference.value();
     return new StateBucket(outletState);
@@ -203,6 +206,9 @@ class OutletComponentManager {
 
   didRenderLayout(bucket) {
     bucket.finalize();
+
+    //SPIKE: GJ
+    window.lastComponent = undefined;
   }
 
   didCreateElement() {}

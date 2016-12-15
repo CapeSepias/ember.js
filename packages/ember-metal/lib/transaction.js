@@ -42,6 +42,10 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
     runInDebug(() => {
       let lastRenderedFrom = meta.writableLastRenderedFrom();
       lastRenderedFrom[key] = reference;
+
+      //SPIKE: GJ
+      var lastRenderedInTemplate = meta.writableLastRenderedInTemplate();
+      lastRenderedInTemplate[key] = window.lastComponent;
     });
   };
 
@@ -56,6 +60,9 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
           let parts = [];
           let lastRef = ref[key];
 
+          let templates = meta.readableLastRenderedInTemplate();
+          var lastTemplate = templates[key];
+
           let label;
 
           if (lastRef) {
@@ -69,7 +76,7 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
             label = 'the same value';
           }
 
-          return `You modified ${parts.join('.')} twice on ${object} in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
+          return `You rendered "${parts.join('.')}" in "${lastTemplate}" and modified it in "${window.lastComponent}" (${object}) in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
         }()),
         false);
 
