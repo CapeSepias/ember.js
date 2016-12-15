@@ -47,9 +47,8 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
       let lastRenderedFrom = meta.writableLastRenderedFrom();
       lastRenderedFrom[key] = reference;
 
-      if (environment) { //TODO: GJ: why is environment sometimes undefined?
-        var lastRenderedInTemplate = meta.writableLastRenderedInTemplate();
-        lastRenderedInTemplate[key] = environment.templateStack[environment.templateStack.length-1];
+      let lastRenderedInTemplate = meta.writableLastRenderedInTemplate();
+      lastRenderedInTemplate[key] = environment.templateStack[environment.templateStack.length-1];
       }
     });
   };
