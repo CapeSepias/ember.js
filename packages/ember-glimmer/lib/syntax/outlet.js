@@ -8,7 +8,7 @@ import {
   StatementSyntax,
   ComponentDefinition
 } from 'glimmer-runtime';
-import { _instrumentStart } from 'ember-metal';
+import { runInDebug, _instrumentStart } from 'ember-metal';
 import { RootReference } from '../utils/references';
 import {
   UpdatableTag,
@@ -180,6 +180,8 @@ class OutletComponentManager {
   }
 
   create(environment, definition, args, dynamicScope) {
+    runInDebug(() => this._pushTemplateToDebugStack(definition, environment));
+
     let outletStateReference = dynamicScope.outletState = dynamicScope.outletState.get('outlets').get(definition.outletName);
     let outletState = outletStateReference.value();
     return new StateBucket(outletState);
@@ -203,6 +205,8 @@ class OutletComponentManager {
 
   didRenderLayout(bucket) {
     bucket.finalize();
+
+    runInDebug(() => this.templateDebugStack.pop());
   }
 
   didCreateElement() {}
@@ -210,12 +214,19 @@ class OutletComponentManager {
   update(bucket) {}
   didUpdateLayout(bucket) {}
   didUpdate(state) {}
+
+  _pushTemplateToDebugStack(definition, environment) {
+    environment.templateDebugStack.push(definition.template.meta.moduleName);
+    this.templateDebugStack = environment.templateDebugStack;
+  }
 }
 
 const MANAGER = new OutletComponentManager();
 
 class TopLevelOutletComponentManager extends OutletComponentManager {
   create(environment, definition, args, dynamicScope) {
+    runInDebug(() => this._pushTemplateToDebugStack(definition, environment));
+
     return new StateBucket(dynamicScope.outletState.value());
   }
 

@@ -190,6 +190,8 @@ class CurlyComponentManager {
     let processedArgs = ComponentArgs.create(args);
     let { props } = processedArgs.value();
 
+    runInDebug(() => this._pushTemplateToDebugStack(klass, environment));
+
     aliasIdToElementId(args, props);
 
     props.parentView = parentView;
@@ -302,6 +304,8 @@ class CurlyComponentManager {
   didRenderLayout(bucket, bounds) {
     bucket.component[BOUNDS] = bounds;
     bucket.finalize();
+
+    runInDebug(() => this.templateDebugStack.pop());
   }
 
   getTag({ component }) {
@@ -318,6 +322,8 @@ class CurlyComponentManager {
 
   update(bucket, _, dynamicScope) {
     let { component, args, argsRevision, environment } = bucket;
+
+    runInDebug(() => this._pushTemplateToDebugStack(Object.getPrototypeOf(component), environment));
 
     bucket.finalizer = _instrumentStart('render.component', rerenderInstrumentDetails, component);
 
@@ -357,6 +363,12 @@ class CurlyComponentManager {
   getDestructor(stateBucket) {
     return stateBucket;
   }
+
+  _pushTemplateToDebugStack(componentClass, environment) {
+    let templateName = componentClass._debugContainerKey;
+    environment.templateDebugStack.push(templateName);
+    this.templateDebugStack = environment.templateDebugStack;
+  }
 }
 
 const MANAGER = new CurlyComponentManager();
@@ -364,6 +376,8 @@ const MANAGER = new CurlyComponentManager();
 class TopComponentManager extends CurlyComponentManager {
   create(environment, definition, args, dynamicScope, currentScope, hasBlock) {
     let component = definition.ComponentClass;
+
+    runInDebug(() => this._pushTemplateToDebugStack(component, environment));
 
     let finalizer = _instrumentStart('render.component', initialRenderInstrumentDetails, component);
 
