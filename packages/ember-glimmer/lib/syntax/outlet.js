@@ -8,7 +8,10 @@ import {
   StatementSyntax,
   ComponentDefinition
 } from 'glimmer-runtime';
-import { _instrumentStart } from 'ember-metal';
+import {
+  runInDebug,
+  _instrumentStart
+} from 'ember-metal';
 import { RootReference } from '../utils/references';
 import {
   UpdatableTag,
@@ -180,8 +183,10 @@ class OutletComponentManager {
   }
 
   create(environment, definition, args, dynamicScope) {
-    //SPIKE: GJ
-    window.lastComponent = definition.template.meta.moduleName;
+    runInDebug(() => {
+      environment.templateStack.push(definition.template.meta.moduleName);
+      this.environment = environment;
+    });
 
     let outletStateReference = dynamicScope.outletState = dynamicScope.outletState.get('outlets').get(definition.outletName);
     let outletState = outletStateReference.value();
@@ -207,8 +212,11 @@ class OutletComponentManager {
   didRenderLayout(bucket) {
     bucket.finalize();
 
-    //SPIKE: GJ
-    window.lastComponent = undefined;
+    runInDebug(() => {
+      if(this.environment) {
+        this.environment.templateStack.pop();
+      }
+    });
   }
 
   didCreateElement() {}

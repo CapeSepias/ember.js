@@ -184,8 +184,10 @@ class CurlyComponentManager {
   }
 
   create(environment, definition, args, dynamicScope, callerSelfRef, hasBlock) {
-    //SPIKE: GJ
-    window.lastComponent = definition.ComponentClass. _debugContainerKey;
+    runInDebug(() => {
+      environment.templateStack.push(definition.ComponentClass._debugContainerKey);
+      this.environment = environment;
+    });
 
     let parentView = dynamicScope.view;
 
@@ -306,8 +308,7 @@ class CurlyComponentManager {
     bucket.component[BOUNDS] = bounds;
     bucket.finalize();
 
-    //SPIKE: GJ
-    window.lastComponent = undefined;
+    runInDebug(() => this.environment.templateStack.pop());
   }
 
   getTag({ component }) {
@@ -325,8 +326,11 @@ class CurlyComponentManager {
   update(bucket, _, dynamicScope) {
     let { component, args, argsRevision, environment } = bucket;
 
-    //SPIKE: GJ: record the current component
-    window.lastComponent = Object.getPrototypeOf(bucket.component)._debugContainerKey;
+    runInDebug(() => {
+      //TODO: GJ: environment.debug.pushTemplate(..)
+      environment.templateStack.push(Object.getPrototypeOf(bucket.component)._debugContainerKey);
+      this.environment = environment;
+    });
 
     bucket.finalizer = _instrumentStart('render.component', rerenderInstrumentDetails, component);
 

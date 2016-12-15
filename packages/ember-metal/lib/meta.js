@@ -67,8 +67,9 @@ const IS_PROXY = 1 << 4;
 if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
     isEnabled('ember-glimmer-allow-backtracking-rerender')) {
   members.lastRendered = ownMap;
+
+  //TODO: GJ: rename `lastRenderedFrom`?
   members.lastRenderedFrom = ownMap; // FIXME: not used in production, remove me from prod builds
-  //SPIKE: GJ
   members.lastRenderedInTemplate = ownMap;
 }
 

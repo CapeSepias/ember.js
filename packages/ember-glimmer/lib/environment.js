@@ -131,6 +131,8 @@ export default class Environment extends GlimmerEnvironment {
       '-html-safe': htmlSafeHelper,
       '-get-dynamic-var': getDynamicVar
     };
+
+    runInDebug(() => this.templateStack = []);
   }
 
   // Hello future traveler, welcome to the world of syntax refinement.

@@ -23,10 +23,14 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
   let counter = 0;
   let inTransaction = false;
   let shouldReflush;
+  let environment;
 
   runInTransaction = function(context, methodName) {
     shouldReflush = false;
     inTransaction = true;
+    runInDebug(() => {
+      environment = context.env;
+    });
     context[methodName]();
     inTransaction = false;
     counter++;
@@ -43,9 +47,10 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
       let lastRenderedFrom = meta.writableLastRenderedFrom();
       lastRenderedFrom[key] = reference;
 
-      //SPIKE: GJ
-      var lastRenderedInTemplate = meta.writableLastRenderedInTemplate();
-      lastRenderedInTemplate[key] = window.lastComponent;
+      if (environment) { //TODO: GJ: why is environment sometimes undefined?
+        var lastRenderedInTemplate = meta.writableLastRenderedInTemplate();
+        lastRenderedInTemplate[key] = environment.templateStack[environment.templateStack.length-1];
+      }
     });
   };
 
@@ -61,7 +66,7 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
           let lastRef = ref[key];
 
           let templates = meta.readableLastRenderedInTemplate();
-          var lastTemplate = templates[key];
+          var lastRenderedInTemplate = templates[key];
 
           let label;
 
@@ -76,7 +81,8 @@ if (isEnabled('ember-glimmer-detect-backtracking-rerender') ||
             label = 'the same value';
           }
 
-          return `You rendered "${parts.join('.')}" in "${lastTemplate}" and modified it in "${window.lastComponent}" (${object}) in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
+          let currentTemplate = environment.templateStack[environment.templateStack.length-1];
+          return `You rendered "${parts.join('.')}" in "${lastRenderedInTemplate}" and modified it in "${currentTemplate}" (${object}) in a single render. This was unreliable and slow in Ember 1.x and ${implication}`;
         }()),
         false);
 
