@@ -2147,7 +2147,7 @@ moduleFor('Components test: curly components', class extends RenderingTest {
   }
 
   ['@test when a shared dependency is changed during children\'s rendering'](assert) {
-    let outer;
+    let outer, middle;
 
     this.registerComponent('x-outer', {
       ComponentClass: Component.extend({
